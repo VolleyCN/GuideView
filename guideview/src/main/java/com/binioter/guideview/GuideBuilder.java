@@ -1,15 +1,15 @@
 package com.binioter.guideview;
 
-import android.support.annotation.AnimatorRes;
-import android.support.annotation.IdRes;
-import android.support.annotation.IntRange;
 import android.view.View;
+
+import androidx.annotation.AnimatorRes;
+import androidx.annotation.IdRes;
+import androidx.annotation.IntRange;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
  * <h1>遮罩系统构建器</h1>
  * 本系统能够快速的为一个Activity里的任何一个View控件创建一个遮罩式的引导页。
  * </p>
@@ -32,14 +32,14 @@ import java.util.List;
  * 可以对遮罩系统设置开始和结束时的动画效果 {@link #setEnterAnimationId(int)}
  * {@link #setExitAnimationId(int)}
  * </p>
- *
+ * <p>
  * Created by binIoter
  **/
 
 public class GuideBuilder {
 
     public enum SlideState {
-        UP,DOWN;
+        UP, DOWN;
     }
 
     private Configuration mConfiguration;
@@ -66,7 +66,7 @@ public class GuideBuilder {
      * @param alpha [0-255] 0 表示完全透明，255表示不透明
      * @return GuideBuilder
      */
-    public GuideBuilder setAlpha(@IntRange(from = 0, to = 255)  int alpha) {
+    public GuideBuilder setAlpha(@IntRange(from = 0, to = 255) int alpha) {
         if (mBuilt) {
             throw new BuildException("Already created. rebuild a new one.");
         } else if (alpha < 0 || alpha > 255) {
@@ -344,15 +344,17 @@ public class GuideBuilder {
     /**
      * 手势滑动监听
      */
-    public static interface OnSlideListener {
-
+    public interface OnSlideListener {
         void onSlideListener(SlideState state);
+
+        void onTouchTarget();
+
     }
 
     /**
      * 遮罩可见发生变化时的事件监听
      */
-    public static interface OnVisibilityChangedListener {
+    public interface OnVisibilityChangedListener {
 
         void onShown();
 

@@ -1,0 +1,26 @@
+ext {
+    // app 相关版本控制
+    versions = [
+            minSdkVersion     : 21,//版本号最低支持5.0
+            compileSdkVersion : 29,
+            buildToolsVersion : "29.0.3",
+            applicationId     : "com.lanjing.guideview",
+            sdkCompileVersion : 29,
+            versionCode       : 203073,//大版本2  中02  中06  小0
+            versionName       : "2.3.73",
+            androidx_appcompat: "androidx.appcompat:appcompat:1.4.0"
+    ]
+
+    extra = [
+            appcompat       : "1.2.0",
+            material        : "1.3.0",
+            constraintlayout: "2.0.4",
+            junit_p         : "4.+",
+            junit_exrt      : "1.1.2",
+            espresso        : "3.3.0",
+            multidex        : "1.0.3",
+            glide           : "4.12.0",
+            gson            : "2.8.7",
+            logger          : "2.2.0",
+    ]
+}

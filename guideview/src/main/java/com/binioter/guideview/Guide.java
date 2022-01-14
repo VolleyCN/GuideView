@@ -2,6 +2,7 @@ package com.binioter.guideview;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.RectF;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -14,14 +15,12 @@ import android.view.animation.AnimationUtils;
  * * 外部需要调用{@link GuideBuilder}来创建该实例，实例创建后调用
  * * {@link #show(Activity)} 控制显示； 调用 {@link #dismiss()}让遮罩系统消失。 <br>
  * <p>
- * Created by binIoter
+ * Created by Meng
  */
 
 public class Guide implements View.OnKeyListener, View.OnTouchListener {
-
     Guide() {
     }
-
     /**
      * 滑动临界值
      */
@@ -29,7 +28,7 @@ public class Guide implements View.OnKeyListener, View.OnTouchListener {
     private Configuration mConfiguration;
     private MaskView mMaskView;
     private Component[] mComponents;
-    // 根据locInwindow定位后，是否需要判断loc值非0
+    // 根据locInWindow定位后，是否需要判断loc值非0
     private boolean mShouldCheckLocInWindow = true;
     private GuideBuilder.OnVisibilityChangedListener mOnVisibilityChangedListener;
     private GuideBuilder.OnSlideListener mOnSlideListener;
@@ -52,16 +51,13 @@ public class Guide implements View.OnKeyListener, View.OnTouchListener {
 
     /**
      * 显示遮罩
-     *
      * @param activity 目标Activity
      */
     public void show(Activity activity) {
         show(activity, null);
     }
-
     /**
      * 显示遮罩
-     *
      * @param activity 目标Activity
      * @param overlay  遮罩层view
      */
@@ -163,11 +159,13 @@ public class Guide implements View.OnKeyListener, View.OnTouchListener {
     }
 
     /**
-     * 根据locInwindow定位后，是否需要判断loc值非0
+     * 根据locInWindow定位后，是否需要判断loc值非0
      */
     public void setShouldCheckLocInWindow(boolean set) {
         mShouldCheckLocInWindow = set;
     }
+
+    private RectF mTargetRect;
 
     private MaskView onCreateView(Activity activity, ViewGroup overlay) {
         if (overlay == null) {
@@ -185,7 +183,6 @@ public class Guide implements View.OnKeyListener, View.OnTouchListener {
         maskView.setHighTargetGraphStyle(mConfiguration.mGraphStyle);
         maskView.setOverlayTarget(mConfiguration.mOverlayTarget);
         maskView.setOnKeyListener(this);
-
         // For removing the height of status bar we need the root content view's
         // location on screen
         int parentX = 0;
@@ -198,7 +195,7 @@ public class Guide implements View.OnKeyListener, View.OnTouchListener {
         }
 
         if (mConfiguration.mTargetView != null) {
-            maskView.setTargetRect(Common.getViewAbsRect(mConfiguration.mTargetView, parentX, parentY));
+            mTargetRect = maskView.setTargetRect(Common.getViewAbsRect(mConfiguration.mTargetView, parentX, parentY));
         } else {
             // Gets the target view's abs rect
             View target = activity.findViewById(mConfiguration.mTargetViewId);
@@ -217,7 +214,6 @@ public class Guide implements View.OnKeyListener, View.OnTouchListener {
         for (Component c : mComponents) {
             maskView.addView(Common.componentToView(activity.getLayoutInflater(), c));
         }
-
         return maskView;
     }
 
@@ -250,13 +246,16 @@ public class Guide implements View.OnKeyListener, View.OnTouchListener {
         if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
             startY = motionEvent.getY();
         } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-            if (startY - motionEvent.getY() > DimenUtil.dp2px(view.getContext(), SLIDE_THRESHOLD)) {
-                if (mOnSlideListener != null) {
+            if (mOnSlideListener != null) {
+                float x = motionEvent.getX();
+                float y = motionEvent.getY();
+                if (startY - y > DimenUtil.dp2px(view.getContext(), SLIDE_THRESHOLD)) {
                     mOnSlideListener.onSlideListener(GuideBuilder.SlideState.UP);
-                }
-            } else if (motionEvent.getY() - startY > DimenUtil.dp2px(view.getContext(), SLIDE_THRESHOLD)) {
-                if (mOnSlideListener != null) {
+                } else if (y - startY > DimenUtil.dp2px(view.getContext(), SLIDE_THRESHOLD)) {
                     mOnSlideListener.onSlideListener(GuideBuilder.SlideState.DOWN);
+                } else if (mTargetRect != null && mTargetRect.left <= x && x <= mTargetRect.right
+                        && mTargetRect.top <= y && y <= mTargetRect.bottom) {
+                    mOnSlideListener.onTouchTarget();
                 }
             }
             if (mConfiguration != null && mConfiguration.mAutoDismiss) {
@@ -265,4 +264,6 @@ public class Guide implements View.OnKeyListener, View.OnTouchListener {
         }
         return true;
     }
+
+
 }

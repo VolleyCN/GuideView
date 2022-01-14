@@ -3,16 +3,20 @@ package com.demo.aty;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
+
 import com.binioter.guideview.Guide;
 import com.binioter.guideview.GuideBuilder;
 import com.demo.component.MutiComponent;
 import com.demo.guide.R;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,88 +26,114 @@ import java.util.List;
  * 描述:
  */
 public class MyListActivity extends Activity {
-  ListView listView;
-  BaseAdapter adapter;
-  static List<String> arrayList = new ArrayList<>();
+    ListView listView;
+    BaseAdapter adapter;
+    static List<String> arrayList = new ArrayList<>();
 
-  @Override protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.my_list_layout);
-    for (int i = 1; i < 200; i++) {
-      arrayList.add("第" + i + "行");
-    }
-    listView = (ListView) findViewById(R.id.list);
-    adapter = new MyAdapter(this);
-    listView.setAdapter(adapter);
-  }
-
-  private static class MyAdapter extends BaseAdapter {
-    private Context mContext;
-    private int showTimes = 0;
-
-    public MyAdapter(Context context) {
-      this.mContext = context;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.my_list_layout);
+        for (int i = 1; i < 200; i++) {
+            arrayList.add("第" + i + "行");
+        }
+        listView = (ListView) findViewById(R.id.list);
+        adapter = new MyAdapter(this);
+        listView.setAdapter(adapter);
     }
 
-    @Override public int getCount() {
-      return arrayList.size();
-    }
+    private static class MyAdapter extends BaseAdapter {
+        private Context mContext;
+        private int showTimes = 0;
 
-    @Override public Object getItem(int i) {
-      return arrayList.get(i);
-    }
-
-    @Override public long getItemId(int i) {
-      return i;
-    }
-
-    @Override public View getView(int i, View view, ViewGroup viewGroup) {
-      ViewHolder holder;
-      if (view == null) {
-        view = LayoutInflater.from(mContext).inflate(R.layout.item, viewGroup, false);
-        holder = new ViewHolder();
-        holder.btn = (Button) view.findViewById(R.id.btn);
-        view.setTag(holder);
-      } else {
-        holder = (ViewHolder) view.getTag();
-      }
-      holder.btn.setText(arrayList.get(i));
-      if (i == 5 && showTimes == 0) {
-        final View finalView = view;
-        view.post(new Runnable() {
-          @Override public void run() {
-            showGuideView(finalView);
-          }
-        });
-      }
-      return view;
-    }
-
-    public void showGuideView(View targetView) {
-      showTimes++;
-      GuideBuilder builder = new GuideBuilder();
-      builder.setTargetView(targetView)
-          .setAlpha(150)
-          .setHighTargetCorner(20)
-          .setHighTargetPadding(10)
-          .setOverlayTarget(false)
-          .setOutsideTouchable(false);
-      builder.setOnVisibilityChangedListener(new GuideBuilder.OnVisibilityChangedListener() {
-        @Override public void onShown() {
+        public MyAdapter(Context context) {
+            this.mContext = context;
         }
 
-        @Override public void onDismiss() {
+        @Override
+        public int getCount() {
+            return arrayList.size();
         }
-      });
 
-      builder.addComponent(new MutiComponent());
-      Guide guide = builder.createGuide();
-      guide.setShouldCheckLocInWindow(true);
-      guide.show((Activity) mContext);
-    }
+        @Override
+        public Object getItem(int i) {
+            return arrayList.get(i);
+        }
 
-    private static class ViewHolder {
-      private Button btn;
+        @Override
+        public long getItemId(int i) {
+            return i;
+        }
+
+        @Override
+        public View getView(int i, View view, ViewGroup viewGroup) {
+            ViewHolder holder;
+            if (view == null) {
+                view = LayoutInflater.from(mContext).inflate(R.layout.item, viewGroup, false);
+                holder = new ViewHolder();
+                holder.btn = (Button) view.findViewById(R.id.btn);
+                view.setTag(holder);
+            } else {
+                holder = (ViewHolder) view.getTag();
+            }
+            holder.btn.setText(arrayList.get(i));
+            if (i == 5 && showTimes == 0) {
+                final View finalView = view;
+                view.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        showGuideView(finalView);
+                    }
+                });
+            }
+            holder.btn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(v.getContext(), "我猜猜猜", Toast.LENGTH_SHORT).show();
+                }
+            });
+            return view;
+        }
+
+        public void showGuideView(final View targetView) {
+            showTimes++;
+            GuideBuilder builder = new GuideBuilder();
+            builder.setTargetView(targetView)
+                    .setAlpha(150)
+                    .setHighTargetCorner(20)
+                    .setHighTargetPadding(10)
+                    .setOverlayTarget(false)
+                    .setAutoDismiss(false)
+                    .setOutsideTouchable(false);
+            builder.setOnVisibilityChangedListener(new GuideBuilder.OnVisibilityChangedListener() {
+                @Override
+                public void onShown() {
+                }
+
+                @Override
+                public void onDismiss() {
+                }
+            });
+            builder.setOnSlideListener(new GuideBuilder.OnSlideListener() {
+                @Override
+                public void onSlideListener(GuideBuilder.SlideState state) {
+                    Log.e("onSlideListener", state == GuideBuilder.SlideState.UP ? "up" : "down");
+                }
+
+                @Override
+                public void onTouchTarget() {
+                    Log.e("onTouchTarget", "onTouchTarget");
+
+                }
+            });
+            builder.addComponent(new MutiComponent());
+            Guide guide = builder.createGuide();
+            guide.setShouldCheckLocInWindow(true);
+            guide.show((Activity) mContext);
+        }
+
+        private static class ViewHolder {
+            private Button btn;
+        }
     }
-  }
 }

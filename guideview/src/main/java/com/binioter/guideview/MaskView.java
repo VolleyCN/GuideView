@@ -1,5 +1,7 @@
 package com.binioter.guideview;
 
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -11,11 +13,10 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-
-import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 /**
  * Created by binIoter
@@ -302,13 +303,11 @@ class MaskView extends ViewGroup {
         mEraserCanvas.drawColor(mFullingPaint.getColor());
         if (!mOverlayTarget) {
             switch (mStyle) {
-                case Component.ROUNDRECT:
-                    mEraserCanvas.drawRoundRect(mTargetRect, mCorner, mCorner, mEraser);
-                    break;
                 case Component.CIRCLE:
                     mEraserCanvas.drawCircle(mTargetRect.centerX(), mTargetRect.centerY(),
                             mTargetRect.width() / 2, mEraser);
                     break;
+                case Component.ROUNDRECT:
                 default:
                     mEraserCanvas.drawRoundRect(mTargetRect, mCorner, mCorner, mEraser);
                     break;
@@ -317,8 +316,9 @@ class MaskView extends ViewGroup {
         canvas.drawBitmap(mEraserBitmap, mOverlayRect.left, mOverlayRect.top, null);
     }
 
-    public void setTargetRect(Rect rect) {
+    public RectF setTargetRect(Rect rect) {
         mTargetRect.set(rect);
+        return mTargetRect;
     }
 
     public void setFullingAlpha(int alpha) {

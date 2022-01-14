@@ -1,15 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion "28.0.1"
-
+    def versions = rootProject.ext.versions
+    compileSdkVersion versions.compileSdkVersion
+    buildToolsVersion versions.buildToolsVersion
     defaultConfig {
-        applicationId "com.binioter.guide"
-        minSdkVersion 17
-        targetSdkVersion 28
-        versionCode 1
-        versionName "1.0"
+        applicationId versions.applicationId
+        minSdkVersion versions.minSdkVersion
+        targetSdkVersion versions.sdkCompileVersion
+        versionCode versions.versionCode
+        versionName versions.versionName
     }
     buildTypes {
         release {
@@ -20,8 +20,12 @@ android {
 }
 
 dependencies {
+    def extra = rootProject.ext.extra
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.airbnb.android:lottie:3.0.7'
     implementation project(':guideview')
+
+    api 'com.airbnb.android:lottie:3.7.0'
+    api "androidx.appcompat:appcompat:$extra.appcompat"
+    api "androidx.constraintlayout:constraintlayout:$extra.constraintlayout"
     //implementation 'com.binioter:guideview:1.0.0'
 }
